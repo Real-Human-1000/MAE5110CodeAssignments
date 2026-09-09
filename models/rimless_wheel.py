@@ -11,8 +11,8 @@ def dynamics(t, state, params, poincare_section=None):
     mass = params["mass"]
     gravity = params["gravity"]
     length = params["spoke_length"]
-    half_spoke_angle = params["half_spoke_angle"]
     slope_angle = params["slope_angle"]
+    half_spoke_angle = np.pi / float(params["num_spokes"])  # half-angle between spokes, radians
 
     abs_angle = state[0]
     angular_velocity = state[1]
@@ -48,15 +48,14 @@ def dynamics(t, state, params, poincare_section=None):
 
 
 def generate_params():
-    num_spokes = 8
     params = {
         "gravity": 9.81,  # gravitational acceleration, m/s^2
         "spoke_length": 0.5,  # spoke length, m
-        "num_spokes": num_spokes,  # number of spokes around the entire wheel
+        "num_spokes": 8,  # number of spokes around the entire wheel
         "slope_angle": 0.2,  # slope angle, radians
-        "half_spoke_angle": np.pi / num_spokes,  # half-angle between spokes, radians
         "mass": 1,  # mass of center of wheel, kg
     }
+    # half spoke angle depends on num_spokes, so it will need to be calculated
     return params
 
 
