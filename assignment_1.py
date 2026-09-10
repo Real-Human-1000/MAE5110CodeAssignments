@@ -115,14 +115,14 @@ def calculate_regions_of_attraction(params, eps=5e-2, num_angles=5, num_velociti
 
     # imshow levels legend courtesy of:
     # https://stackoverflow.com/questions/25482876/how-to-add-legend-to-imshow-in-matplotlib
-    # get the colors of the values, according to the colormap used by imshow
+    # Get the colors of the values, according to the colormap used by imshow
     colors = [im.cmap(im.norm(value)) for value in range(len(attractors))]
     # create a patch (proxy artist) for every color
     patches = [
         mpatches.Patch(color=colors[i], label=f"Attractor {i}")
         for i in range(len(attractors))
     ]
-    # put those patched as legend-handles into the legend
+    # Put those patched as legend-handles into the legend
     plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
     # Finish and display/save the plot
     # plt.grid(True)
@@ -141,83 +141,98 @@ def calculate_regions_of_attraction(params, eps=5e-2, num_angles=5, num_velociti
         plt.savefig(os.path.join("output", output_name, f"attractor_{att_idx}.png"))
 
 
-params = model.generate_params()
-params["slope_angle"] = 0.2
+if __name__ == "__main__":
+    # Main script
+    # I just like how this looks
+    
+    # Generate default param values (contains slope angle, number of spokes, etc.)
+    params = model.generate_params()
+    
+    # State is stance angle (in the range for one spoke) and stance angular velocity
+    initial_state = np.array([0.0, 0.5])
+    
+    timestep = 1e-3
+    sim_time = 5.0  # 5.0 seconds is generally enough to reach a recognizable attractor
+    
+    time_traj, state_traj = integrator.integrate(params, model, initial_state, timestep, sim_time)
+    kinetic_energy, potential_energy = model.calculate_energy(state_traj, params)
+    
+    # Plot the angle over time
+    plt.figure()
+    plt.plot(time_traj, state_traj[0], 'bo:', label="Angle")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Angle (radians)")
+    plt.title("Rimless Wheel Angle vs Time")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+    
+    # Phase diagram: velocity vs angle
+    plt.figure()
+    plt.plot(state_traj[0], state_traj[1], 'bo:', alpha=0.1, label="Trajectory")
+    plt.xlabel("Angle (radians)")
+    plt.ylabel("Angular Velocity (rad/s)")
+    plt.title("Rimless Wheel Phase Portrait")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+    
+    # Plot the system energy over time
+    plt.figure()
+    plt.plot(time_traj, potential_energy, 'bo:', label="Potential energy")
+    plt.plot(time_traj, kinetic_energy, 'ro:', label="Kinetic energy")
+    plt.plot(time_traj, potential_energy + kinetic_energy, 'go:', label="Total energy")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Energy (J)")
+    plt.title("Pendulum energy")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
-# State is stance angle and stance angular velocity
-initial_state = np.array([-0.3, 0.5])
-
-timestep = 1e-3
-sim_time = 5.0
-
-time_traj, state_traj = integrator.integrate(params, model, initial_state, timestep, sim_time)
-kinetic_energy, potential_energy = model.calculate_energy(state_traj, params)
-
-# Plot the angle over time
-plt.figure()
-plt.plot(time_traj, state_traj[0], 'bo:', label="Angle")
-plt.xlabel("Time (s)")
-plt.ylabel("Angle (radians)")
-plt.title("Rimless Wheel Angle vs Time")
-plt.legend()
-plt.tight_layout()
-plt.show()
-
-# Phase diagram: velocity vs angle
-plt.figure()
-plt.plot(state_traj[0], state_traj[1], 'bo:', alpha=0.1, label="Trajectory")
-plt.xlabel("Angle (radians)")
-plt.ylabel("Angular Velocity (rad/s)")
-plt.title("Rimless Wheel Phase Portrait")
-plt.legend()
-plt.tight_layout()
-plt.show()
-
-# Plot the system energy over time
-plt.figure()
-plt.plot(time_traj, potential_energy, 'bo:', label="Potential energy")
-plt.plot(time_traj, kinetic_energy, 'ro:', label="Kinetic energy")
-plt.plot(time_traj, potential_energy + kinetic_energy, 'go:', label="Total energy")
-plt.xlabel("Time (s)")
-plt.ylabel("Energy (J)")
-plt.title("Pendulum energy")
-plt.legend()
-plt.tight_layout()
-plt.show()
+    
+    # Searching for Regions of Attraction
+    # I want to make this as automated as possible
+    # Please note that the output plots of this function are saved as images in output/{output_name}
+    # Regions of Attraction for my default params:
+    calculate_regions_of_attraction(params, eps=1e-2, num_angles=25, num_velocities=25, output_name="default")
+    # Regions of Attraction for an extra-steep slope:
+    params = model.generate_params()
+    params["slope_angle"] = params["slope_angle"] * 2
+    calculate_regions_of_attraction(params, num_angles=25, num_velocities=25, output_name="steep_slope")
+    # Regions of Attraction for a normal slope and 12 spokes
+    params = model.generate_params()
+    params["num_spokes"] = 12
+    calculate_regions_of_attraction(params, num_angles=25, num_velocities=25, output_name="12_spokes")
 
 
-# Searching for Regions of Attraction
-# I want to make this as automated as possible
-calculate_regions_of_attraction(params, eps=1e-2, num_angles=99, num_velocities=99, output_name="default")
+    # Poincare Section
+    # The model.dynamics() function adds contact states to the provided list
+    # Maybe that's not ideal...
+    params = model.generate_params()  # Make sure we're back to a standard set of params
+    initial_state = np.array([0.0, 0.5])
+    poincare_section = []
+    time_traj, state_traj = integrator.integrate(params, model, initial_state, timestep, sim_time, dynamics_args={"poincare_section":poincare_section})
 
-# params["slope_angle"] = params["slope_angle"] * 2
-# calculate_regions_of_attraction(params, num_angles=25, num_velocities=25, output_name="steep_slope")
-# params["slope_angle"] = params["slope_angle"] / 2
-# params["num_spokes"] = 12
-# calculate_regions_of_attraction(params, num_angles=25, num_velocities=25, output_name="12_spokes")
+    # Plot crossings
+    plt.figure()
+    min_vel = min([p[1] for p in poincare_section])
+    max_vel = max([p[1] for p in poincare_section])
+    plt.plot([min_vel*0.9,1.1*max_vel],[0.9*min_vel,1.1*max_vel], label="Identity Line")
+    plt.title("Return Map for Angular Velocity and Identity Line")
+    plt.xlabel("Previous value of Angular Velocity (rad/s)")
+    plt.ylabel("Next value of Angular Velocity (rad/s)")
+    plt.legend()
+    for i in range(len(poincare_section)-1):
+        plt.plot(poincare_section[i][1], poincare_section[i+1][1], 'rx')
+    plt.savefig(os.path.join("output", "return_map.png"))
+    for i in range(len(poincare_section)-1):
+        plt.gca().text(poincare_section[i][1], poincare_section[i+1][1], f"{i}", fontsize=12)
+    plt.show()
+    # The contact points right around the identity line like jumping back and forth, maybe because of simulation issues
+    print(f"Computer-estimated fixed point: {sum([poincare_section[-i][1] for i in range(4)])/4}")
 
 
-# # Poincare Section
-# initial_state = np.array([0.0, 0.5])
-# poincare_section = []
-# time_traj, state_traj = integrator.integrate(params, model, initial_state, timestep, sim_time, dynamics_args={"poincare_section":poincare_section})
-#
-# # Plot crossings
-# plt.figure()
-# max_vel = max([p[1] for p in poincare_section])
-# plt.plot([0,1.1*max_vel],[0,1.1*max_vel], label="Identity Line")
-# for i in range(len(poincare_section)-1):
-#     plt.plot(poincare_section[i][1], poincare_section[i+1][1], 'rx')
-#     plt.gca().text(poincare_section[i][1], poincare_section[i+1][1], f"{i}", fontsize=12)
-# plt.title("Return Map for Angular Velocity and Identity Line")
-# plt.xlabel("Previous value of Angular Velocity (rad/s)")
-# plt.ylabel("Next value of Angular Velocity (rad/s)")
-# plt.legend()
-# plt.show()
-# print(f"Calculated fixed point: {sum([poincare_section[-i][1] for i in range(5)])/5}")
-# # Fixed point appears to be about (2.460474, 2.460474)
-#
-#
-# # plt.figure()
-# # plt.plot(range(len(poincare_section)), [p[1] for p in poincare_section])
-# # plt.show()
+    # Floquet Multiplier
+    # plt.figure()
+    # plt.plot(range(len(poincare_section)), [p[1] for p in poincare_section])
+    # plt.show()
