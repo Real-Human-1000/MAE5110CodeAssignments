@@ -10,11 +10,44 @@
 
 ## Coding Practices
 
-### Clean Code of the week: naming variables and functions
+### Clean Code of the week: functions and encapsulation
 
+It's often convenient (especially for these assignments) to have all your work in a single file, so you have an immediate overview of what's happening and can easily move around and change things.
+This can, however, quickly get out of hand; as it does, you should start to encapsulate things into functions or even separate modules (like the integrators and models).
+What should these functions look like?
 
+- **Do one thing, do it only, and do it well.** A function name describes what it does; it should do that and only that.
+  - _bad_: 
+  ```
+  def dynamics(state, params):
+    [...]
+    return gradients, energies
+  ```
+  - _good_:
+  ```
+  def dynamics(state, params):
+    [...]
+    return gradients
+  ```
 
-## Model: the Rimless Wheel
+- **Don't repeat yourself** if you have copy/pasted the same code twice, you should probably encapsulate it. Repeated code is very error prone, since it's easy to forget to apply changes everywhere.
+
+- **One level of abstraction**
+    If you're reading a paper that keeps alternating between high-level concepts and nitty-gritty details, it creates a heavier cognitive load, as you keep multiple levels of abstraction in your head. It's the same with code. Use functions to encapsulate details so that you can read the script at one level of abstraction: the level you're currently developing in.
+    - _good while developing the controller_:
+    ```
+    for loop:
+        control_input = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
+        next_state = integrate(model, params)
+    ```
+    - _good once finished with controller development_:
+    ```
+    for loop:
+        control_input = compute_feedback_controller(state, params)
+        next_state = integrate(model, params)
+    ```
+
+## Model: the Inverted Pendulum Walker
 
 This week's model is a slight variation of the rimless wheel that introduces two control inputs: $u = \left[u_1, u_2 \right] = \left[\tau, \alpha \right]$, where $\tau$ is a small torque that can be applied to the pivot joint of the pendulum (the "ankle"), and $\alpha$ is half the angle between stance and swing legs, just like in the rimless wheel.
 Your task will be to solve for a policy that, for a slope incline $\gamma = 0.06$ rad, will bring the walker to a standing equilibrium in as few steps as possible.
