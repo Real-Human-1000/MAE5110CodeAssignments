@@ -1,15 +1,18 @@
 # Assignment 2
 
-**Due date:** Sunday, September 20th, 11:59PM (midnight)
+**PR opening deadline:** Thursday, September 17th, 11:59PM (midnight)
+**First Code Review deadline:** Sunday, September 20th, 11:59PM (midnight)
+**Report Submission deadline:** Wednesday, September 23rd, 11:59 (midnight)
+
+You should open a PR to your own `main` branch with a clear title to make it easy to find. Your peer code-reviewing assignment will be posted on Canvas: go find the and give the code review by the code review deadline. You are encouraged to take the initiative and communicate actively with your reviewer, and your reviewee; e.g. if you are ready for a review before the deadline, let your reviewer know.
 
 **Goals:**
-
 - Implement both continuous and discrete (event-based) controllers
 - Build familiarity with Poincaré sections
 - Build familiarity with gridding methods
-
+- Interact with colleagues via code-reviews professionally
+- 
 ## Coding Practices
-
 ### Clean Code of the week: functions and encapsulation
 
 It's often convenient (especially for these assignments) to have all your work in a single file, so you have an immediate overview of what's happening and can easily move around and change things.
@@ -38,7 +41,7 @@ What should these functions look like?
     ```
     for loop:
         control_input = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
-        params["ankle_torque"] = control_input
+        params["ankle_torque"] = np.clip(control_input, min_torque, max_torque)
         next_state = integrate(model, params)
     ```
     - _good once finished with controller development_:
@@ -48,7 +51,7 @@ What should these functions look like?
         next_state = integrate(model, params)
     ```
 
-- **Make intent explicit** Just as function names should start with a verb describing what will happen, their signature should make their intent explicit as well. In the bad example below, reading the function call keeps the change to the `params` implicit, and a reader wouldn't know unless they went to look at the function implementation.
+- **Make intent explicit** Just as function names should start with a verb describing what will happen, their signature should make their intent explicit as well. In the bad example below, reading the function call keeps the change to the `params` implicit, and a reader wouldn't know unless they went to look at the function implementation. The good example forces the function call to make the effect explicit.
   - _bad_:
   ```
     def compute_ankle_torque(state, params):
@@ -58,7 +61,8 @@ What should these functions look like?
   - _good_:
   ```
     def compute_ankle_torque(state, params):
-        return Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
+        control_input = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
+        return np.clip(control_input, min_torque, max_torque)
     ```
 
 ## Model: the Inverted Pendulum Walker
