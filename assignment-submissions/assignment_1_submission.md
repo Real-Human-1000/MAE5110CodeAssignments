@@ -20,7 +20,9 @@ Basic sanity checks can be confirmed by looking at three plots:
 
 ## Regions of Attraction
 For the default parameters of the rimless wheel, a plot like this is generated:
+
 ![Regions of Attraction for the default params](images/rimlesswheel_regions.png "Hi how's it going")
+
 In this plot, Attractor 0 is a fixed point representing the wheel not having enough momentum to go over its spoke and just resting for all eternity.
 Attractor 1 is the fixed point where the wheel is perfectly balanced on one spoke; this is a very unstable equilibrium.
 Attractor 2 is the limit cycle produced as the wheel rolls down the slope.
@@ -30,7 +32,9 @@ When the script is actually run, plots of these attractors in phase-space are ge
 The one-dimensional return map shows the angular velocity after collision plotted against the angular velocity before collision.
 The live version of the plot includes labels for each point denoting their order.
 This plot represents a wheel simulated with my default params.
-![One-Dimensional Return Map](images/rimlesswheel_returnmap.png "I'm still on campus working on this nonsense in the middle of the night")
+
+![One-Dimensional Return Map](images/rimlesswheel_returnmap.png "I'm glad that this assignment was extended bc I really needed that extra time")
+
 The fixed point appears to be about 2.48.
 
 ## Effect of slope and number of spokes on Regions of Attraction and local convergence
