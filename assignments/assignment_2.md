@@ -21,13 +21,13 @@ What should these functions look like?
   ```
   def dynamics(state, params):
     [...]
-    return gradients, energies
+    return state_derivative, energies
   ```
   - _good_:
   ```
   def dynamics(state, params):
     [...]
-    return gradients
+    return state_derivative
   ```
 
 - **Don't repeat yourself** if you have copy/pasted the same code twice, you should probably encapsulate it. Repeated code is very error prone, since it's easy to forget to apply changes everywhere.
@@ -38,13 +38,27 @@ What should these functions look like?
     ```
     for loop:
         control_input = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
+        params["ankle_torque"] = control_input
         next_state = integrate(model, params)
     ```
     - _good once finished with controller development_:
     ```
     for loop:
-        control_input = compute_feedback_controller(state, params)
+        params["ankle_torque"] = compute_ankle_torque(state, params)
         next_state = integrate(model, params)
+    ```
+
+- **Make intent explicit** Just as function names should start with a verb describing what will happen, their signature should make their intent explicit as well. In the bad example below, reading the function call keeps the change to the `params` implicit, and a reader wouldn't know unless they went to look at the function implementation.
+  - _bad_:
+  ```
+    def compute_ankle_torque(state, params):
+        params["ankle_torque"] = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
+        return
+    ```
+  - _good_:
+  ```
+    def compute_ankle_torque(state, params):
+        return Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
     ```
 
 ## Model: the Inverted Pendulum Walker
