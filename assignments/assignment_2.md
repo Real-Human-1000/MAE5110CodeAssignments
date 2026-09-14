@@ -117,7 +117,7 @@ for i in range(states.shape[1]):
 plt.close(fig)
 ```
 
-Sample at evenly spaced simulation times for a video with a fixed frame rate. You can also call the same visualizer from `matplotlib.animation.FuncAnimation` to save a GIF or video directly. The default view places the current stance foot at the origin, so it recenters at impact. For a view of the walker moving through the world, supply `stance_position=(x, y)` and fixed `view_limits=(xmin, xmax, ymin, ymax)`; see the function's docstring. Below-ground geometry is shown in red to help debug your simulation.
+Sample at evenly spaced simulation times for a video with a fixed frame rate. You can also call the same visualizer from `matplotlib.animation.FuncAnimation` to save a GIF or video directly. The default view places the current stance foot at the origin, so it recenters at impact. For a view of the walker moving through the world, supply `stance_position=(x, y)` and fixed `view_limits=(xmin, xmax, ymin, ymax)`; see the function's docstring.
 
 ### Stabilize the upright equilibrium with Feedback Linearization
 
