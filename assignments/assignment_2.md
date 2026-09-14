@@ -21,13 +21,13 @@ What should these functions look like?
 
 - **Do one thing, do it only, and do it well.** A function name describes what it does; it should do that and only that.
   - _bad_: 
-  ```
+  ```python
   def dynamics(state, params):
     [...]
     return state_derivative, energies
   ```
   - _good_:
-  ```
+  ```python
   def evaluate_dynamics(state, params):
     [...]
     return state_derivative
@@ -38,14 +38,14 @@ What should these functions look like?
 - **One level of abstraction**
     If you're reading a paper that keeps alternating between high-level concepts and nitty-gritty details, it creates a heavier cognitive load, as you keep multiple levels of abstraction in your head. It's the same with code. Use functions to encapsulate details so that you can read the script at one level of abstraction: the level you're currently developing in.
     - _good while developing the controller_:
-    ```
+    ```python
     for loop:
         control_input = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
         params["ankle_torque"] = np.clip(control_input, min_torque, max_torque)
         next_state = integrate(model, params)
     ```
     - _good once finished with controller development_:
-    ```
+    ```python
     for loop:
         params["ankle_torque"] = compute_ankle_torque(state, params)
         next_state = integrate(model, params)
@@ -53,13 +53,13 @@ What should these functions look like?
 
 - **Make intent explicit** Just as function names should start with a verb describing what will happen, their signature should make their intent explicit as well.
   - _bad_:
-  ```
+  ```python
     def compute_ankle_torque(state, params):
         params["ankle_torque"] = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
         return
     ```
   - _good_:
-  ```
+  ```python
     def compute_ankle_torque(state, params):
         control_input = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
         return np.clip(control_input, min_torque, max_torque)
