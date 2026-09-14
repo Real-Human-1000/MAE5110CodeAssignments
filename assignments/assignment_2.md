@@ -11,7 +11,7 @@ You should open a PR to your own `main` branch with a clear title to make it eas
 - Build familiarity with Poincaré sections
 - Build familiarity with gridding methods
 - Interact with colleagues via code-reviews professionally
-- 
+
 ## Coding Practices
 ### Clean Code of the week: functions and encapsulation
 
@@ -28,7 +28,7 @@ What should these functions look like?
   ```
   - _good_:
   ```
-  def dynamics(state, params):
+  def evaluate_dynamics(state, params):
     [...]
     return state_derivative
   ```
@@ -51,7 +51,7 @@ What should these functions look like?
         next_state = integrate(model, params)
     ```
 
-- **Make intent explicit** Just as function names should start with a verb describing what will happen, their signature should make their intent explicit as well. In the bad example below, reading the function call keeps the change to the `params` implicit, and a reader wouldn't know unless they went to look at the function implementation. The good example forces the function call to make the effect explicit.
+- **Make intent explicit** Just as function names should start with a verb describing what will happen, their signature should make their intent explicit as well.
   - _bad_:
   ```
     def compute_ankle_torque(state, params):
@@ -64,6 +64,7 @@ What should these functions look like?
         control_input = Kp * (state[0] - desired_state[0]) + Kd * (state[1] - desired_state[1])
         return np.clip(control_input, min_torque, max_torque)
     ```
+  In the bad example, reading the function call keeps the change to the `params` implicit, and a reader wouldn't know unless they went to look at the function implementation. The good example forces the function call to make the effect explicit.
 
 ## Model: the Inverted Pendulum Walker
 
@@ -90,34 +91,9 @@ In your script, you'll also define the following bounds: $\alpha \in \left[ \fra
 
 ### Visualizing the walker
 
-The code stub includes `visualize(state, params)`, which draws the walker without calling your dynamics. The state is `[theta, angular_velocity]`, with `theta` measured clockwise from upward vertical. It uses `length`, `incline`, and `angle_of_attack` (half the inter-leg angle) from your parameter dictionary, and displays `ankle_torque` if supplied. All angles are in radians. Note, you may need to rename your params (or modify the visualizer code) to match.
+Use [`assignment_2.py`](../assignment_2.py) as a starting point for your experiment. Run `uv run python assignment_2.py` to display an animation and save `output/assignment_2/walker.gif`. The placeholder dynamics keep the pose fixed until you implement the continuous dynamics and impact functions.
 
-```python
-import matplotlib.pyplot as plt
-from models import inverted_pendulum_walker as model
-
-# your experiment code
-
-ax = model.visualize(state, params)
-plt.show()
-```
-
-For a sequence of images, reuse the axes. Here `states` has shape `(2, N)`, and `params_history[i]` holds a copy of the parameters used at sample `i`, including the chosen step angle and ankle torque. `show_swing_history[i]` says whether to draw the swing leg at that sample; set it to `False` while the leg is held clear or while balancing. The visualizer draws a straight swing leg at the supplied angle; it does not invent a swing trajectory.
-
-```python
-from pathlib import Path
-
-frames = Path("output/walker_frames")
-frames.mkdir(parents=True, exist_ok=True)
-fig, ax = plt.subplots(figsize=(6, 6), layout="constrained")
-for i in range(states.shape[1]):
-    model.visualize(states[:, i], params_history[i], ax=ax,
-                    show_swing=show_swing_history[i])
-    fig.savefig(frames / f"frame_{i:05d}.png", dpi=120)
-plt.close(fig)
-```
-
-Sample at evenly spaced simulation times for a video with a fixed frame rate. You can also call the same visualizer from `matplotlib.animation.FuncAnimation` to save a GIF or video directly. The default view places the current stance foot at the origin, so it recenters at impact. For a view of the walker moving through the world, supply `stance_position=(x, y)` and fixed `view_limits=(xmin, xmax, ymin, ymax)`; see the function's docstring.
+The visualizer expects `[theta, angular_velocity]`, with `theta` measured clockwise from upward vertical and angles in radians. Match the parameter names in the starter script; you shouldn't need to, but you can always look under the hood in [`visualize`](../models/inverted_pendulum_walker.py).
 
 ### Stabilize the upright equilibrium with Feedback Linearization
 
