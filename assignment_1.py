@@ -1,5 +1,4 @@
 import os
-import timeit
 
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
@@ -9,7 +8,6 @@ from integrators import explicit_euler as integrator
 from models import rimless_wheel as model
 
 
-# Convenience functions for specific analytical products
 def calculate_regions_of_attraction(params, eps=5e-2, num_angles=5, num_velocities=5, output_name="roa"):
     # Generate a plot displaying the Regions of Attraction for the system
     # Inputs:
@@ -311,18 +309,19 @@ if __name__ == "__main__":
     # Sweeping inclinations and number of spokes
     # This includes the original, default param values, so we'll just lump that in here too
     # Please note that the output plots of this function are saved as images in output/{output_name}
-    initial_state = np.array([0.0, 1.0])
-    for slope_angle in np.linspace(0,0.35,7):
-        params = model.generate_params()
-        params["slope_angle"] = slope_angle
-        output_name = f"angle_{slope_angle:.2f}".replace(".","-")
-        calculate_regions_of_attraction(params, num_angles=50, num_velocities=50, output_name=output_name)
-        calculate_poincare_return_map(params, initial_state=initial_state, output_name=output_name)
+    if True:  # Change to False to disable the costly sweep
+        initial_state = np.array([0.0, 1.0])
+        for slope_angle in np.linspace(0,0.35,7):
+            params = model.generate_params()
+            params["slope_angle"] = slope_angle
+            output_name = f"angle_{slope_angle:.2f}".replace(".","-")
+            calculate_regions_of_attraction(params, num_angles=50, num_velocities=50, output_name=output_name)
+            calculate_poincare_return_map(params, initial_state=initial_state, output_name=output_name)
 
-    for num_spokes in (6, 7, 8, 9, 10, 11, 12):
-        params = model.generate_params()
-        params["num_spokes"] = num_spokes
-        output_name = f"{num_spokes}_spokes".replace(".", "-")
-        calculate_regions_of_attraction(params, num_angles=50, num_velocities=50, output_name=output_name)
-        calculate_poincare_return_map(params, initial_state=initial_state, output_name=output_name)
+        for num_spokes in (6, 7, 8, 9, 10, 11, 12):
+            params = model.generate_params()
+            params["num_spokes"] = num_spokes
+            output_name = f"{num_spokes}_spokes".replace(".", "-")
+            calculate_regions_of_attraction(params, num_angles=50, num_velocities=50, output_name=output_name)
+            calculate_poincare_return_map(params, initial_state=initial_state, output_name=output_name)
 

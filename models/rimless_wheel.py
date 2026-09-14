@@ -44,6 +44,9 @@ def dynamics(t, state, params, poincare_section=None):
         # This is poor form, but we can actually just modify the state in-place
         state[0] = -half_spoke_angle + slope_angle
         state[1] = angular_velocity
+        # Update these values again for derivative calc
+        abs_angle = state[0]
+        angular_velocity = state[1]
         if poincare_section is not None:
             poincare_section.append(state)
     if rel_angle < -half_spoke_angle:
