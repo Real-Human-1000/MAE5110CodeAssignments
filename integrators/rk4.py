@@ -26,3 +26,23 @@ def integrate(params, model, initial_state, timestep, sim_time):
 
     return time_traj, state_traj
 
+
+def integrate_step(params, model, initial_state, t, timestep):
+    # Integrate a system using 4th Order Runge-Kutta methods
+    # Subject to errors at large timesteps
+    # Inputs:
+    #   params - dict of model params, e.g. gravity, lengths, etc.
+    #   model - system model, which has a dynamics function
+    #   initial_state - numpy vector representing the initial state (nx1)
+    #   t: current time
+    #   timestep - size of timesteps, in seconds
+    # Output: Next state vector (2x1 array)
+
+    # simulate step
+    k1 = model.dynamics(t, initial_state, params)
+    k2 = model.dynamics(t + timestep/2, initial_state + k1 * timestep/2, params)
+    k3 = model.dynamics(t + timestep/2, initial_state + k2 * timestep/2, params)
+    k4 = model.dynamics(t + timestep, initial_state + k3 * timestep, params)
+    return initial_state + timestep / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+
+
