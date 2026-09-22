@@ -124,7 +124,15 @@ def calculate_ankle_roa(params):
         for ang_vel_idx in range(initial_velocities.size):
             initial_ang_vel = initial_velocities[ang_vel_idx]
             initial_state = np.array([initial_angle, initial_ang_vel])
-            time_traj, state_traj, completed_steps = simulate_walker(params, initial_state, timestep, sim_time, 1, dummy_controller_map, dummy_controller_bounds)
+            time_traj, state_traj, completed_steps = simulate_walker(
+                params,
+                initial_state,
+                timestep,
+                sim_time,
+                1,
+                dummy_controller_map,
+                dummy_controller_bounds
+            )
             # Tracking the number of steps actually makes this correlation super easy
             # If a step was taken, then we know that the ankle controller wasn't able to slow the walker to a stop
             # Also, if the final state isn't near static vertical, then we know it must have gone off the rails
@@ -210,33 +218,199 @@ def plot_poincare_section(poincare_section):
 
 
 # Fixed controls for this visualization example.
-params = {
-    "gravity": 9.81,  # m/s^2
-    "length": 1.0,  # m
-    "mass": 1.0,  # kg
-    "incline": 0.06,  # rad
-    "angle_of_attack": np.pi / 8,  # rad
-    "ankle_torque": 0.0,  # N m
-}
+params = model.generate_params()
 
 ankle_controller_bounds, ankle_controller_map = load_ankle_controller(params)
 
-initial_state = np.array([0.0, 3.0])
+initial_state = np.array([0.0, 1.0])
 timestep = 1e-3
 sim_time = 5.0
 desired_number_of_steps = 8
 
 poincare_section = []
 
-time_traj, state_traj, completed_steps = simulate_walker(params, initial_state, timestep, sim_time, desired_number_of_steps, ankle_controller_bounds, ankle_controller_map, poincare_section=poincare_section)
+time_traj, state_traj, completed_steps = simulate_walker(
+        params,
+        initial_state,
+        timestep,
+        sim_time,
+        desired_number_of_steps,
+        ankle_controller_bounds,
+        ankle_controller_map,
+        poincare_section=poincare_section,
+    )
+
 print(f"Simulated for {time_traj[-1]} seconds; recorded {completed_steps} steps")
-visualize(time_traj, state_traj)
+#visualize(time_traj, state_traj)
+
 
 # Build a lookup table of leg angle control actions
-num_velocities = 50
-initial_velocities = np.linspace(0, np.sqrt(2 * params["gravity"] / params["length"]), num_velocities)
-num_actions = 20
+print("Building step angle graph")
+max_initial_velocity = np.sqrt(2 * params["gravity"] / params["length"])
+num_actions = 10
 actions = np.linspace(np.pi/8, np.pi/7, num_actions)
-#
-# for vel_idx in range(num_velocities):
-#     for action_idx in range(num_actions):
+
+# We need some data structure to store the connections between initial velocities (nodes)
+# We can probably fairly assume that each control angle at each initial velocity will only lead to one other velocity
+connection_tol = 0.05  # tolerance between states for equivalence, rad/s
+connections = {max_initial_velocity: {}, 0: {}}  # graph; structured as {upstream velocity: {action: downstream velocity, action: downstream velocity, ...}, ...}
+# Instead of doing this in a simple and logical way, we can set this up as a graph traversal problem!
+# We can guide the search with a stack to construct the full extent of the graph
+# Each entry in the stack will be composed of an ordered pair, (velocity, action)
+# When we simulate a pair, we can remove it from the stack and, if they're not in the graph, add all actions of the next state
+stack = [(max_initial_velocity, actions[i]) for i in range(num_actions)]
+
+# Seed with some initial velocities
+# This kind of negates the usefulness of the stack-based expansion
+# Well, I thought it was a cool idea
+for vel in np.arange(0, max_initial_velocity, connection_tol):
+    connections[vel] = {}
+    for act in actions:
+        stack.append((vel, act))
+
+# Constant simulation properties
+timestep = 1e-3
+sim_time = 5.0
+desired_number_of_steps = 2  # We expect there to be one step, but we'll look at the Poincare section before the second one
+
+while len(stack) > 0:
+    print(f"Stack size: {len(stack)}")
+    # Just to make sure we start with the same params every time
+    # Fixed controls for this visualization example.
+    params = model.generate_params()
+
+    case = stack.pop()
+    initial_velocity = case[0]
+    action = case[1]
+    params["angle_of_attack"] = action
+    initial_state = np.array([0.0, initial_velocity])
+
+    poincare_section = []
+
+    time_traj, state_traj, completed_steps = simulate_walker(
+        params,
+        initial_state,
+        timestep,
+        sim_time,
+        desired_number_of_steps,
+        ankle_controller_bounds,
+        ankle_controller_map,
+        poincare_section=poincare_section,
+    )
+
+    # If the Poincare section didn't register anything, then this IC leads to stability or a failure state
+    if len(poincare_section) == 0:
+        if abs(state_traj[0,-1]) < connection_tol and abs(state_traj[1,-1]) < connection_tol:
+            # Stable
+            next_velocity = 0
+        else:
+            next_velocity = -1  # failure state
+    else:
+        next_velocity = poincare_section[0]
+
+    # Since we're using the velocity values directly, equivalence between velocities should be within a tolerance
+    # We will assume that our initial_velocity already went through this process and matches to something in the connections
+    already_in_graph = False
+    for graph_vel in connections:
+        if abs(graph_vel - next_velocity) < connection_tol:
+            # These points are practically the same
+            next_velocity = graph_vel
+            already_in_graph = True
+
+    connections[initial_velocity][action] = next_velocity
+
+    if not already_in_graph:
+        connections[next_velocity] = {}
+        stack += [(next_velocity, a) for a in actions]
+
+# Visualize the graph as a table
+# Build an actual 2D array of initial velocities and control angles
+lookup_table = np.zeros((len(connections.keys())-1, num_actions))
+for vel_idx, vel in enumerate([v for v in sorted(connections.keys()) if v != -1]):
+    for act_idx in range(num_actions):
+        lookup_table[vel_idx][act_idx] = connections[vel][actions[act_idx]]
+
+
+im = plt.imshow(lookup_table, origin="lower", extent=(actions[0],actions[-1],0,max_initial_velocity))
+plt.gca().set_aspect((actions[-1] - actions[0]) / (max_initial_velocity - 0))
+cbar = plt.gcf().colorbar(im)
+cbar.set_label('Next angular velocity',size=12,rotation=270)
+plt.xlabel("Control angle (radians)")
+plt.ylabel("Angular velocity at $\\theta = 0$ (rad/s)")
+plt.title("Control Table\nVelocity of -1 denotes failure")
+plt.tight_layout()
+plt.savefig(Path("output-assignment2/assignment_2/table.png"))
+plt.show()
+
+
+# Create a graph to visualize all the connections
+# This is just pure connections, not the values of actions that actually lead to these connections
+plt.figure()
+t = -np.linspace(-np.pi/2, np.pi/2,25)
+# Mess with t a little bit to put more points around 0, which makes it look smoother in this plot
+t = ((np.pi/2) / np.pow(np.pi/2,3)) * np.pow(t,3)
+for node in connections:
+    for edge in connections[node]:
+        # Draw an arc going to the next node
+        next_node = connections[node][edge]
+        switch = 1
+        col = 'g'
+        if next_node == -1:
+            switch = -1
+            col = 'r'
+        rad = (node - next_node) / 2
+        plt.plot(switch * abs(rad) * np.cos(t), ((node + next_node) / 2) + rad * np.sin(t), col+'-', alpha=0.2)
+plt.plot([0 for key in connections if key != -1], [key for key in connections if key != -1], "bo")
+plt.plot(0, -1, 'bx')
+#plt.axis("equal")
+plt.title("Poincare Section Velocity Graph")
+plt.ylabel("Angular velocity at $\\theta = 0$")
+plt.savefig(Path("output-assignment2/assignment_2/poincare.png"))
+plt.show()
+
+
+# Plot initial velocities by number of steps to stability
+# The way that we have stored the graph makes this obnoxiously difficult
+# This might be easiest if we just reverse connections the graph
+reversed_connections = {}
+for node in connections:
+    for edge in connections[node]:
+        if connections[node][edge] not in reversed_connections:
+            reversed_connections[connections[node][edge]] = []
+        reversed_connections[connections[node][edge]].append(node)
+# Note that the keys of reversed_connections are only those nodes which can be reached by another node
+# e.g. the maximum initial velocity isn't a key because there's no way to get to it, but it is represented inside of some of the keys' lists
+
+# Now we can traverse the reversed graph, starting from 0, and record how many steps are required to get anywhere
+# We can also assemble a lookup table of optimal controls to make the visual look prettier
+steps = {0:0}
+optimal_connections = {}
+stack = [0]
+while len(stack) > 0:
+    print(f"Stack size: {len(stack)}")
+    node = stack.pop()
+    if node in reversed_connections:
+        for edge in reversed_connections[node]:
+            if edge not in steps:
+                steps[edge] = steps[node] + 1
+                optimal_connections[edge] = node
+                stack.append(edge)
+            else:
+                if steps[edge] > steps[node]+1:
+                    # Replace
+                    steps[edge] = steps[node]+1
+                    optimal_connections[edge] = node
+
+# Plot the steps
+plt.figure()
+for s in reversed(range(max([steps[i] for i in steps])+1)):
+    applicable_nodes = [i for i in steps if steps[i] == s]
+    if s != 0:
+        for node in applicable_nodes:
+            plt.plot((s, s-1), (node, optimal_connections[node]), 'g-')
+    plt.plot([s] * len(applicable_nodes), applicable_nodes, "bo")
+plt.title("Steps Required for Stability")
+plt.xlabel("Steps before stability")
+plt.ylabel("Angular velocity at $\\theta = 0$")
+plt.savefig(Path("output-assignment2/assignment_2/steps.png"))
+plt.show()
