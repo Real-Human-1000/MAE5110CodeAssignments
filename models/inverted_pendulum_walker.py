@@ -84,12 +84,12 @@ def update_ankle_torque(state, params):
     angle = state[0]
     angular_velocity = state[1]
 
-    pendulum_acceleration = (mass * gravity * length * np.sin(angle))# / (mass * length**2)
-    pos_control = -angle * 10  # TODO: update these controller gains with more specific numbers
-    deriv_control = -angular_velocity * 10
+    pendulum_force = mass * gravity * length * np.sin(angle)
+    pos_control = -angle * 5  # Completely arbitrary controller gains
+    deriv_control = -angular_velocity * 5
 
     # We can enforce the ankle torque limits here, too
-    ankle_torque = -pendulum_acceleration + deriv_control + pos_control
+    ankle_torque = -pendulum_force + deriv_control + pos_control
     params["ankle_torque"] = max(
         -0.1 * mass * length * gravity,
         min(ankle_torque, 0.05 * mass * length * gravity),
@@ -115,8 +115,8 @@ def dynamics(t, state, params):
     ankle_torque = max(-0.1 * mass * length * gravity, min(params["ankle_torque"], 0.05 * mass * length * gravity))
 
     angular_acceleration = (
-        mass * gravity * length * np.sin(angle)
-    ) / (mass * length**2) + ankle_torque
+        mass * gravity * length * np.sin(angle) + ankle_torque
+    ) / (mass * length**2)
 
     state_derivative = np.array([angular_velocity, angular_acceleration])
     return state_derivative
