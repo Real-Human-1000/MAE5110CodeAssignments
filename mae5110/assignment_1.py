@@ -8,6 +8,7 @@ from models import rimless_wheel as model
 
 params = model.generate_params()
 
+
 def simulate(initial_state, params, t_max, dt_base, *, settle_speed=1e-3):
     if dt_base <= 0 or settle_speed <= 0:
         raise ValueError("dt_base and settle_speed must be positive")

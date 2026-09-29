@@ -6,3 +6,5 @@ __pycache__/
 .pytest_cache/
 uv.lock
 assignments_tex/
+# Generated figures, animations, and data; recreate with the assignment scripts.
+output/
