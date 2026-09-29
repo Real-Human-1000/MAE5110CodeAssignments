@@ -115,7 +115,7 @@ plt.show()
 params = model_bb.generate_params()
 
 # Initial conditions for the model
-initial_state = np.array([0.0, 0.0, 1.0, 0.0])
+initial_state=model_bb.generate_initial_condition()
 
 # We're keeping the timestep and sim length from the pendulum
 

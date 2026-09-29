@@ -84,6 +84,9 @@ def generate_params():
     # half spoke angle depends on num_spokes, so it will need to be calculated
     return params
 
+def generate_initial_condition():
+    initial_state = np.array([0.0,1.0])
+    return initial_state
 
 def calculate_energy(state, params):
     # Calculate the energy for a certain state of this system
