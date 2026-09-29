@@ -8,5 +8,5 @@ uv.lock
 assignments_tex/
 
 # Assignment 2 figures, numerical tables, and compiled report are reproducible.
-output/
+output-assignment1/
 tmp/pdfs/
