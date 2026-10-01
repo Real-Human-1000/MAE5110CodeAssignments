@@ -20,8 +20,8 @@ from models import compass_gait as model
 params = model.generate_params()
 params["hip_torque"] = 0.0  # N m; passive downhill walking
 initial_state = model.generate_initial_condition()
-timestep = 0.002  # s
-sim_time = 6.0  # s
+timestep = 0.002  # in s
+sim_time = 6.0  # in s
 SAVE_GIF = False  # Exporting every animation frame takes several seconds.
 
 # %% Simulation
@@ -132,6 +132,6 @@ if SAVE_GIF:
 print(f"Saved plots to {output} ({completed_steps} heelstrikes).")
 draw_frame(0)
 plt.show()
-# Display playback controls when this cell is run in a notebook.
+# Display playback controls when this cell is run in a marimo notebook.
 plt.rcParams["animation.html"] = "jshtml"
 animation  # noqa: B018 — display the animation in the notebook

@@ -237,7 +237,7 @@ def _(
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), layout="constrained")
     angle_ticks = np.arange(-2, 3) * np.pi / 2
     angle_labels = [r"$-\pi$", r"$-\pi/2$", "0", r"$\pi/2$", r"$\pi$"]
-    velocity_ticks = np.arange(-3, 4) * np.pi
+    velocity_ticks = np.arange(-3, 4) * np.piy
     velocity_labels = [
         r"$-3\pi$",
         r"$-2\pi$",
