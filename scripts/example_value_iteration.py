@@ -184,7 +184,7 @@ animation_axis.set(
     aspect="equal",
 )
 animation_axis.grid(alpha=0.25)
-animation_axis.plot(0, 0, "ko", zorder=3)  # fixed pivot
+animation_axis.plot(0, 0, "ko", zorder=3)  # Fixed pivot.
 (rod,) = animation_axis.plot([], [], "o-", linewidth=3, markersize=10)
 
 

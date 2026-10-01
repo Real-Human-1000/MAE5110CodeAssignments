@@ -12,7 +12,7 @@ def test_value_iteration_solves_a_small_graph_in_multiple_dimensions():
     expected_value = np.array([[2, 4], [1, 5]])
     expected_policy = np.array([[1, 0], [0, 1]])
 
-    # Node 4 is terminal. At node 2, both actions have value 1; choose the first.
+    # Node 4 is terminal. At Node 2, both actions have value 1; choose the first.
     for grid_shape in [(2, 2), (2, 1, 2)]:
         table_shape = (*grid_shape, 2)
         value, policy = value_iteration(

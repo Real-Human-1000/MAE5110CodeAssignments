@@ -48,5 +48,5 @@ def test_time_dependent_dynamics():
             time = 1.0 + step * timestep
             state = integrator(dynamics, time, state, timestep, params)
 
-        # Integrating 2*t from t=1 to t=2 adds 3; Euler undershoots by 0.01.
+        # Integrating 2*t from t=1 to t=2 adds 3. Euler undershoots by 0.01.
         assert state == pytest.approx([6.0], rel=0, abs=0.02), name
