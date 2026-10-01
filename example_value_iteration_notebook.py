@@ -51,7 +51,7 @@ def _():
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Parameters and grid
+    ## Parameters and grid
     """)
     return
 
@@ -97,7 +97,7 @@ def _(model, np):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Build the transition matrix
+    ## Build the transition matrix
     """)
     return
 
@@ -133,7 +133,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Reward and value iteration
+    ## Reward and value iteration
     """)
     return
 
@@ -152,7 +152,7 @@ def _(discount, grid_points, np, transition_matrix, value_iteration):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Simulate the policy on the continuous pendulum
+    ## Simulate the policy on the continuous pendulum
     """)
     return
 
@@ -210,7 +210,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Plot the value, policy, and continuous trajectory
+    ## Plot the value, policy, and continuous trajectory
     """)
     return
 
@@ -237,7 +237,7 @@ def _(
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), layout="constrained")
     angle_ticks = np.arange(-2, 3) * np.pi / 2
     angle_labels = [r"$-\pi$", r"$-\pi/2$", "0", r"$\pi/2$", r"$\pi$"]
-    velocity_ticks = np.arange(-3, 4) * np.piy
+    velocity_ticks = np.arange(-3, 4) * np.pi
     velocity_labels = [
         r"$-3\pi$",
         r"$-2\pi$",
@@ -304,7 +304,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Animate the pendulum, with zero angle pointing upward.
+    ## Animate the pendulum, with zero angle pointing upward.
     """)
     return
 
@@ -332,7 +332,7 @@ def _(
         aspect="equal",
     )
     animation_axis.grid(alpha=0.25)
-    animation_axis.plot(0, 0, "ko", zorder=3)  # fixed pivot
+    animation_axis.plot(0, 0, "ko", zorder=3)  # Fixed pivot.
     (rod,) = animation_axis.plot([], [], "o-", linewidth=3, markersize=10)
 
 

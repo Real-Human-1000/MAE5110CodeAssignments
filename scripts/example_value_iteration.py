@@ -17,7 +17,7 @@ from integrators import rk4 as integrator
 from models import pendulum as model
 
 # %% [markdown]
-# Parameters and grid
+# ## Parameters and grid
 # %% 
 params = model.generate_params()
 initial_state = np.array([-np.pi, 0.0])  # start hanging down, at rest
@@ -40,7 +40,7 @@ upper = points.max(axis=0)
 
 
 # %% [markdown]
-# Build the transition matrix
+# ## Build the transition matrix
 # %% 
 def step(state, torque):
     """Advance one control interval with constant torque, wrapping the angle."""
@@ -57,7 +57,7 @@ def step(state, torque):
 transition_matrix = build_transition_matrix(grid_points, actions, step)
 
 # %% [markdown] 
-# Reward and value iteration
+# ## Reward and value iteration
 # %% 
 # Reward depends only on the current state: 1 at upright equilibrium, 0 elsewhere.
 upright = np.all(np.isclose(grid_points, [0.0, 0.0]), axis=-1)
@@ -67,7 +67,7 @@ reward[upright] = 1.0  # the same state reward for every action
 value, policy = value_iteration(transition_matrix, reward, discount=discount)
 
 # %% [markdown]  
-# Simulate the policy on the continuous pendulum
+#  ## Simulate the policy on the continuous pendulum
 # %% 
 if np.any(initial_state < lower) or np.any(initial_state > upper):
     raise ValueError("Choose an initial state inside the grid domain.")
@@ -102,14 +102,14 @@ print(
 )
 
 # %% [markdown]
-# Plot the value, policy, and continuous trajectory
+# ## Plot the value, policy, and continuous trajectory
 # %% 
 output = Path("output/value_iteration")
 output.mkdir(parents=True, exist_ok=True)
 fig, axes = plt.subplots(2, 2, figsize=(11, 8), layout="constrained")
 angle_ticks = np.arange(-2, 3) * np.pi / 2
 angle_labels = [r"$-\pi$", r"$-\pi/2$", "0", r"$\pi/2$", r"$\pi$"]
-velocity_ticks = np.arange(-3, 4) * np.piy
+velocity_ticks = np.arange(-3, 4) * np.pi
 velocity_labels = [
     r"$-3\pi$",
     r"$-2\pi$",
@@ -172,7 +172,7 @@ print(f"Saved plots to {output / 'pendulum.png'}.")
 fig  # noqa: B018 — display the figure in the notebook
 
 # %% [markdown]
-# Animate the pendulum, with zero angle pointing upward.
+# ## Animate the pendulum, with zero angle pointing upward.
 # %% 
 length = params["length"]
 animation_fig, animation_axis = plt.subplots(figsize=(4, 4), layout="constrained")
