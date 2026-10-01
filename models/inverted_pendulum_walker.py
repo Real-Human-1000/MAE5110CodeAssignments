@@ -25,6 +25,10 @@ def generate_params():
     }
     return params
 
+def generate_initial_condition():
+    initial_state=np.array([0.0,1.6])
+    return initial_state
+
 
 def hash_params(params):
     # Generate a hash based on params relevant to the ankle controller

@@ -26,3 +26,7 @@ def integrate(params, model, initial_state, timestep, sim_time, dynamics_args={}
 
     return time_traj, state_traj
 
+def integrate_step(dynamics,time,initial_state,timestep,params):
+    new_state = initial_state+timestep*dynamics(time,initial_state,params)
+    return new_state
+

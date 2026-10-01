@@ -75,7 +75,7 @@ def simulate_walker(params, initial_state, timestep, sim_time, desired_number_of
             params["ankle_torque"] = 0.0  # need to reset to disable control
 
         #next_state = state + timestep * model.dynamics(t, state, params)
-        next_state = integrator.integrate_step(params, model, state, t, timestep)
+        next_state = integrator.integrate_step(model.dynamics,t,state,timestep,params)
 
         if model.poincare_map_guard(state, next_state, params):
             # Update angle of attack controller
