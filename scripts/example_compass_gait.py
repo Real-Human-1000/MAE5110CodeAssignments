@@ -38,7 +38,7 @@ for step, t in enumerate(time_traj[:-1]):
     state = state_traj[:, step]
     # A controller can update params["hip_torque"] here.
 
-    next_state = integrator(model.dynamics, t, state, timestep, params)
+    next_state = integrator.integrate_step(model.dynamics,t,state,timestep,params)
     foot_traj[:, step + 1] = foot_traj[:, step]
 
     if model.event_guard(state, next_state, params):
@@ -46,13 +46,13 @@ for step, t in enumerate(time_traj[:-1]):
         lower, upper = 0.0, timestep
         for _ in range(20):
             middle = (lower + upper) / 2
-            contact_state = integrator(model.dynamics, t, state, middle, params)
+            contact_state = integrator.integrate_step(model.dynamics,t,state,middle,params)
             if model.event_guard_value(contact_state, params) > 0:
                 lower = middle
             else:
                 upper = middle
         contact_time = upper
-        contact_state = integrator(model.dynamics, t, state, contact_time, params)
+        contact_state = integrator.integrate_step(model.dynamics,t,state,contact_time,params)
 
         # Accept only a forward foothold at the actual contact time.
         if contact_state[0] > contact_state[1]:
@@ -62,7 +62,7 @@ for step, t in enumerate(time_traj[:-1]):
             completed_steps += 1
 
             # Finish the timestep using the new stance leg.
-            next_state = integrator(
+            next_state = integrator.integrate_step(
                 model.dynamics,
                 t + contact_time,
                 next_state,

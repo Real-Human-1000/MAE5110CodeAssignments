@@ -12,3 +12,14 @@ assignments_tex/
 # Assignment 2 figures, numerical tables, and compiled report are reproducible.
 output-assignment1/
 tmp/pdfs/
+report_assignment_2.pdf
+images/energy.png
+images/gamma_sweep.png
+images/N_spokes_sweep.png
+images/noslope.png
+images/Poincaré_map.png
+images/RoA_map.png
+images/set parameter g 0.png
+output/assignment_2/walker.gif
+output/compass_gait/states.png
+output/value_iteration/pendulum.png
