@@ -27,6 +27,13 @@ def generate_params(*, n_spokes=10, slope=0.2):
     return params
 
 
+def generate_initial_condition():
+    # Generate an initial condition suitable for this model
+    # Inputs: None
+    # Output: length 2 numpy vector
+    return np.array([0,1])
+
+
 def impact_guard(state, params):
 
     theta, theta_dot = state

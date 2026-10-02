@@ -20,6 +20,13 @@ def generate_params(*, incline=0.06):
     return params
 
 
+def generate_initial_condition():
+    # Generate an initial condition suitable for this model
+    # Inputs: None
+    # Output: length 2 numpy vector
+    return np.array([0,1])
+
+
 def dynamics(t, state, params):
     g = params["gravity"]
     l = params["length"]

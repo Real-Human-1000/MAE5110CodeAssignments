@@ -15,7 +15,7 @@ def test_constant_derivative():
     assert integrator_functions, "No integrator functions exported"
     for name, integrator in integrator_functions:
         state = np.array([1.0, 4.0])
-        result = integrator(dynamics, 2.0, state, 0.25, params)
+        result = integrator(dynamics, 2.0, state, 0.25, params)  # dynamics, t, state, timestep, params
 
         assert result == pytest.approx([1.5, 3.25]), name
         assert list(state) == [1.0, 4.0], name
@@ -50,3 +50,4 @@ def test_time_dependent_dynamics():
 
         # Integrating 2*t from t=1 to t=2 adds 3; Euler undershoots by 0.01.
         assert state == pytest.approx([6.0], rel=0, abs=0.02), name
+
