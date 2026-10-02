@@ -1,5 +1,3 @@
-import inspect
-
 import numpy as np
 
 import models.pendulum as model
