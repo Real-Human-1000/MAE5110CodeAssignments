@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation, PillowWriter
 
-from integrators import rk4 as integrator
+from integrators import rk4_step as integrator
 from models import compass_gait as model
 
 # %% Parameters and initial condition

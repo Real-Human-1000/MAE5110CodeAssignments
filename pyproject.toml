@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "mae5110"
@@ -18,13 +18,11 @@ dependencies = [
 dev = [
     "pytest",
 ]
+notebooks = [
+    "marimo>=0.25",
+    "jupytext",
+]
 
-[project.scripts]
-spokes_sweep = "mae5110.assignment_1:spokes_sweep"
-inclination_sweep = "mae5110.assignment_1:inclination_sweep"
-estimate_roa = "mae5110.assignment_1:estimate_roa"
-return_map_plot = "mae5110.assignment_1:return_map_plot"
-test_energy_conservation = "mae5110.assignment_1:test_energy_conservation"
-test_flat_ground_dissipation = "mae5110.assignment_1:test_flat_ground_dissipation"
-test_downhill_limit_cycle = "mae5110.assignment_1:test_downhill_limit_cycle"
-assignment_2 = "mae5110.assignment_2:main"
+[tool.setuptools]
+packages = ["models", "algorithms"]
+package-dir = {"" = "."}
