@@ -15,7 +15,7 @@ def test_no_torque_no_damping():
     initial_state[0] = 1
     initial_state[1] = 1
 
-    timestep = 1e-2
+    timestep = 1e-1
     sim_time = 10
 
     n_timesteps = int(sim_time / timestep) + 1
@@ -49,7 +49,7 @@ def test_torque():
     initial_state[0] = np.pi/2
     initial_state[1] = 0
 
-    timestep = 1e-2
+    timestep = 1e-1
     sim_time = 10
 
     n_timesteps = int(sim_time / timestep) + 1
@@ -83,7 +83,7 @@ def test_damping():
     initial_state[0] = np.pi / 2
     initial_state[1] = 0
 
-    timestep = 1e-2
+    timestep = 1e-1
     sim_time = 20  # this only really works asymptotically, so we need to simulate for longer
 
     n_timesteps = int(sim_time / timestep) + 1
