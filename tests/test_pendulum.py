@@ -8,7 +8,7 @@ def test_no_torque_no_damping():
     # Test that total system energy remains constant when the pendulum has no torque or damping
 
     params = model.generate_params()
-    params["damping_coeff"] = 1
+    params["damping_coeff"] = 0
 
     initial_state = model.generate_initial_condition()
     # Nonzero initial state
