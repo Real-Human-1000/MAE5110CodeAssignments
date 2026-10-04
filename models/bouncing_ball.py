@@ -43,6 +43,11 @@ def generate_params():
     }
     return params
 
+def generate_initial_condition():
+    # The initial condition for the bouncing ball
+    initial_state=np.array([0.0,0.0,1.0,0.0])
+    return initial_state
+
 
 def calculate_energy(state, params):
     gravity = params["gravity"]

@@ -13,6 +13,7 @@ params = {
     "length": 1,  # rod length (m)
     "mass": 0.2,  # point mass at end of rod (kg)
     "damping_coeff": 0.0,  # damping coefficient (kg*m^2/s)
+    "torque": 0.0,  # torque (Nm)
 }
 
 # some set-up
@@ -114,7 +115,7 @@ plt.show()
 params = model_bb.generate_params()
 
 # Initial conditions for the model
-initial_state = np.array([0.0, 0.0, 1.0, 0.0])
+initial_state=model_bb.generate_initial_condition()
 
 # We're keeping the timestep and sim length from the pendulum
 
